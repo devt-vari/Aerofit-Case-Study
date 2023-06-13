@@ -1,0 +1,1092 @@
+#!/usr/bin/env python
+# coding: utf-8
+
+# # Aerofit Case Study
+
+# ### About
+
+# Aerofit is a leading brand in the field of fitness equipment. Aerofit provides a product range including machines such as treadmills, exercise bikes, gym equipment, and fitness accessories to cater to the needs of all categories of people.
+
+# ### Problem Statement
+
+# The market research team at AeroFit wants to identify the characteristics of the target audience for each type of treadmill offered by the company, to provide a better recommendation of the treadmills to the new customers. The team decides to investigate whether there are differences across the product with respect to customer characteristics.
+
+# ### Objective
+
+# •	Create a descriptive analytics to create a customer profile for each AeroFit treadmill product by developing appropriate tables and charts.
+# 
+# •	For each AeroFit treadmill product, construct two-way contingency tables and compute all conditional and marginal probabilities along with their insights/impact on the business.
+
+# ### Loading Libraries & Dataset
+
+# In[36]:
+
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+import warnings
+warnings.filterwarnings('ignore')
+
+
+# In[34]:
+
+
+df = pd.read_csv(r'C:\Users\tiwbrahm\Downloads\aerofit_t.csv')
+df.head()
+
+
+# ### Characterstics
+
+# Dataset contains following columns
+# •	Product Purchased: KP281, KP481 and KP781, are the 3 different types of treadmills that are purchased by customers
+# 
+# •	Age : In years, age of the customer who purchased
+# 
+# •	Gender: Gender of the purchased customer
+# 
+# •	Education: represented in years
+# 
+# •	Marital Status: Single or partnered
+# 
+# •	Usage: The average number of times the customer has planned to use the treadmill each week
+# 
+# •	Fitness: Self rated fitness of the user rated from 1 (as poor shape) to 5 (as excellent shape)
+# 
+# •	Miles: The average number of miles the customer expects to walk or run each week
+# 
+# •	Income: Annual income of the user in Dollars $
+# 
+# 
+
+# In[35]:
+
+
+df.shape
+
+
+# Dataset contains 180 rows and 9 columns
+
+# In[37]:
+
+
+df.info()
+
+
+# •	Product, Gender and Marital Status are object(string)
+# 
+# •	Age, Education, Usage, Fitness, Income and Miles are in int64(integer)
+
+# In[59]:
+
+
+df.describe()
+
+
+# •	Mean Age of the given customer dataset is 28.78
+# 
+# •	Minimum Age of the customer starts from 18 and maximum age is 50
+# 
+# •	25% of the customers age is 24
+# 
+# •	75% of the customer age is 33
+# 
+# •	Maximum Education qualification is 21, with most frequent education as 16
+# 
+# •	Average usage per week for a customer is 3 days
+# 
+# •	Average Fitness rating is 3 with most common fitness rating is 4
+# 
+# •	Average Income of the purchased customer is around 54K per year
+# 
+# •	Highest salary recorded for the customer is around 104K per year
+# 
+# •	Maximum distance covered by the customer in treadmill is 360 miles
+# 
+# •	Most of the customers cover a distance of 114 miles with an average of 103 miles
+# 
+# •	Around 25% of the customer cover an average of 66 miles
+
+# ### Numerical Analysis
+
+# In[41]:
+
+
+# Total number of unique Product ids
+df['Product'].nunique()
+
+
+# In[43]:
+
+
+# unique list of product ids
+df['Product'].unique().tolist()
+
+
+# In[45]:
+
+
+# Total number of unique ages
+total_unique_age = df['Age'].nunique()
+total_unique_age
+
+
+# In[47]:
+
+
+# list of unique ages
+df['Age'].unique()
+
+
+# In[49]:
+
+
+# Number of Male and Female customers
+df['Gender'].value_counts()
+
+
+# In[51]:
+
+
+# list of unique Educations
+df['Education'].unique().tolist()
+
+
+# In[53]:
+
+
+# Distinguish customer againts the rating scale 1 to 5
+df['Fitness'].value_counts().sort_index()
+
+
+# In[54]:
+
+
+# Customers with 3 different product types
+df['Product'].value_counts()
+
+
+# In[56]:
+
+
+#Customer counts on how many times they used the treadmill
+df['Usage'].value_counts().sort_index()
+
+
+# In[57]:
+
+
+# Number of Single and Partnered customers
+df['MaritalStatus'].value_counts()
+
+
+# ### Numercial Summary
+
+# •	KP281, KP481, KP781 are the 3 different products
+# 
+# •	There are 32 unique ages
+# 
+# •	104 Males and 76 Females are in the customers list
+# 
+# •	8 unique set of Educations (14, 15, 12, 13, 16, 18, 20, 21)
+# 
+# •	Highest rated Fitness rating is 3
+# 
+# •	Most customers usage treadmill atleast 3 days per week
+# 
+# •	Majority of the customers who have purchased are Partnered
+
+# In[60]:
+
+
+# Converting Int data type of fitness rating to object data type
+df_convert = df
+df_convert['Fitness_Category'] = df.Fitness
+df_convert.head(5)
+
+
+# In[62]:
+
+
+df_convert['Fitness_Category'].replace({1:"Poor",
+                            2:"Bad",
+                            3:"Average",
+                            4:"Good",
+                            5:"Excellent"},inplace=True)
+df_convert.head()
+
+
+# ### Statistical Analysis
+
+# In[82]:
+
+
+# for unique list of products, listed in percentage
+stat_products = df['Product'].value_counts(normalize=True)*100
+stat_products
+
+
+# •	44.44% of customers bought KP281 product type
+# 
+# •	33.33% of customers bought KP481 product type
+# 
+# •	22.22% of customers bought KP781 product type
+
+# In[83]:
+
+
+# for unique list of genders, listed in percentage
+stat_gender = df['Gender'].value_counts(normalize=True)*100
+stat_gender
+
+
+# •	57.78% of customers are Male and 42.22% customers are Female
+
+# In[84]:
+
+
+# for unique list of Marital_Status, listed in percentage
+stat_marital = df['MaritalStatus'].value_counts(normalize=True)*100
+stat_marital
+
+
+# •  59.44% of customers are Married/Partnered
+# 
+# •  40.56% of customers are Single
+
+# In[85]:
+
+
+# for unique list of Usage, listed in percentage
+stat_usage = df['Usage'].value_counts(normalize=True)*100
+stat_usage
+
+
+# •  Around 38%  of customers use the treadwill 3 days/week
+
+# In[86]:
+
+
+# for unique list of Fitness, listed in percentage
+stat_fitness = df_convert['Fitness_Category'].value_counts(normalize=True)*100
+stat_fitness
+
+
+# •  More than 53% of customers have rated themselves 'Average' on Fitness
+
+# ### Visual Analysis
+
+# #### Univariate Analysis
+
+# #### For Object Variables : Countplot, Distplot, Histogram
+
+# In[87]:
+
+
+#Product Analysis - Countplot
+sns.countplot(data=df, x='Product')
+plt.show()
+
+
+# •	KP281 is the most commonly purchase product type
+
+# In[88]:
+
+
+# Marital Status Analysis - Countplot
+sns.countplot(data=df, x='MaritalStatus')
+plt.show()
+
+
+# •	Most products purchased by Partnered customer category
+
+# In[89]:
+
+
+# Gender Analysis - Countplot
+sns.countplot(data=df, x='Gender')
+plt.show()
+
+
+# •	Most products purchased by Males
+
+# In[92]:
+
+
+# Fitness Rating Analysis - Countplot
+sns.countplot(data=df_convert, x='Fitness_Category')
+plt.show()
+
+
+# •	More than 90 customers have rated their physical fitness rating as Average
+
+# In[95]:
+
+
+# Income Analysis - Distplot
+sns.distplot(df.Income,rug=True)
+plt.show()
+
+
+# •	Most of customers who have purchased the product have a average income between 40K to 60K
+
+# In[100]:
+
+
+# Fitness Rating Analysis - Distplot
+sns.distplot(df.Fitness)
+plt.show()
+
+
+# •	Over 1.5 density customer population have rated their physical fitness rating as Average
+
+# In[101]:
+
+
+# Income Analysis - Histogram
+sns.histplot(data=df,x='Income')
+
+
+# •	More than 35 customers earn 50-55K per year
+
+# In[102]:
+
+
+# Education Analysis - Histogram
+sns.histplot(data=df,x='Education')
+
+
+# •	Highest number of customers have 16 as their Education
+
+# In[103]:
+
+
+# Usage Analysis - Histogram
+sns.histplot(data=df,x='Usage')
+
+
+# •	3 days per week is the most common usage among the customers
+
+# In[105]:
+
+
+# Fitness Analysis - Histogram
+sns.histplot(data=df_convert,x='Fitness_Category')
+
+
+# #### For categorical variables: Boxplot
+
+# In[106]:
+
+
+# Usage Analysis - Box plot
+sns.boxplot(data=df,x='Usage')
+plt.show()
+
+
+# •	3 to 4 days is the most preferred usage days for customers
+# 
+# •	6 and 7 days per week is roughly the usage days for few customers (Outliers)
+
+# In[107]:
+
+
+# Age Analysis - Box plot
+sns.boxplot(data=df,x='Age')
+plt.show()
+
+
+# •	23 to 34 is the most common customer age group that has purchased the product
+# 
+# •	Above 45 years old customers are very few compared to the young age group given in the dataset
+
+# In[110]:
+
+
+# Income Analysis - Box plot
+plt.figure(figsize=(12,6))
+sns.boxplot(data=df,x='Income')
+plt.show()
+
+
+# •	Few customers have income above 80K per annum(Outliers)
+
+# In[111]:
+
+
+# Fitness Rating Analysis - Box plot
+sns.boxplot(data=df,x='Fitness')
+plt.show()
+
+
+# •	Couple of customers have rated their fitness rating as 1 - Poor Shape
+# 
+# •	Most customers have rated fitness rating as 3.0 to 4.0
+
+# #### For correlation: Heatmaps, Pairplots
+
+# In[132]:
+
+
+#Correlation HeatMap
+df1 = df[['Age','Education','Usage','Fitness','Income','Miles']]
+plt.figure(figsize=(20,6))
+ax = sns.heatmap(df1.corr(),annot=True,fmt='.4f',linewidths=.5,cmap='coolwarm')
+plt.yticks(rotation=0)
+plt.show()
+
+
+# In the above heatmap linear relationship between data points is evaluated :
+# 
+# •	Correlation between Age and Miles is 0.03
+# 
+# •	Correlation between Education and Income is 0.62
+# 
+# •	Correlation between Usage and Fitness is 0.66
+# 
+# •	Correlation between Fitness and Age is 0.06
+# 
+# •	Correlation between Income and Usage is 0.51
+# 
+# •	Correlation between Miles and Age is 0.03
+
+# In[133]:
+
+
+# Product Analysis - Pair Plot
+sns.pairplot(df,hue='Product',kind='reg')
+plt.show()
+
+
+# In[134]:
+
+
+# Marital Status - pair plot
+sns.pairplot(df,hue='MaritalStatus',kind='reg')
+plt.show()
+
+
+# In[135]:
+
+
+# Gender Analysis - Pair Plot
+sns.pairplot(df,hue='Gender',kind='reg')
+plt.show()
+
+
+# ### Bivariate Analysis
+
+# In[136]:
+
+
+# Average usage of each product type by the customer
+df.groupby('Product')['Usage'].mean()
+
+
+# In[137]:
+
+
+# Average Age of customer using each product
+df.groupby('Product')['Age'].mean()
+
+
+# In[138]:
+
+
+# Average Education of customer using each product
+df.groupby('Product')['Education'].mean()
+
+
+# In[139]:
+
+
+# Average customer fitness rating for each product type purchased
+df.groupby('Product')['Fitness'].mean()
+
+
+# In[140]:
+
+
+# Product purchased among Married/Partnered and Single
+sns.countplot(data=df,x='Product',hue='MaritalStatus')
+plt.show()
+
+
+# •	KP281 is the most preferred product among customers
+
+# In[141]:
+
+
+# Product purchased among Male and Female
+sns.countplot(data=df,x='Product',hue='Gender')
+plt.show()
+
+
+# •	KP281 Product is the equally preferred by both male and female genders
+# 
+# •	KP781 Product is mostly preferred among the Male customers
+# 
+# •	Overall Male customers are the highest product purchasers
+
+# In[142]:
+
+
+# Count among Gender and their Marital Status
+sns.countplot(data=df,x='MaritalStatus',hue='Gender')
+plt.show()
+
+
+# •	Partnered customers are the most buyers of aerofit product
+
+# In[143]:
+
+
+# Purchased product usage among Gender
+plt.figure(figsize=(10,6))
+sns.countplot(data=df,x='Usage',hue='Gender',palette='cool')
+plt.show()
+
+
+# •	Among Male and Female genders, Male's usage is 4 days per week
+
+# In[145]:
+
+
+# Fitness rating among the customers categorised by Gender
+plt.figure(figsize=(10,6))
+sns.countplot(data=df,x='Fitness',hue='Gender')
+plt.show()
+
+
+# •	Significant number of Male customers are at Excellent shape compared to Female customers
+
+# In[146]:
+
+
+# Product purchased Customers Income and their Gender
+plt.figure(figsize=(12,5))
+sns.kdeplot(data=df,x='Income',hue='Gender')
+plt.show()
+
+
+# •	Customers below 40k Income women seems to have more Income, whereas Income more than 40k contains Male having more Income than Women
+
+# In[147]:
+
+
+# Product purchased Customers Usage per week and their Gender
+plt.figure(figsize=(12,5))
+sns.kdeplot(data=df,x='Usage',hue='Gender')
+plt.show()
+
+
+# •	Male customers usage is significantly higher the female customer
+
+# In[148]:
+
+
+# Product purchased Customers Usage per week and their Marital Status
+plt.figure(figsize=(12,5))
+sns.kdeplot(data=df,x='Usage',hue='MaritalStatus')
+plt.show()
+
+
+# •	Partnered customers usage is higher than single customers
+
+# In[149]:
+
+
+# Product purchased Customers Fitness Rating and their Gender
+plt.figure(figsize=(12,5))
+sns.kdeplot(data=df,x='Fitness',hue='Gender')
+plt.show()
+
+
+# •	Male customers are in better shape the female customers
+
+# In[150]:
+
+
+# Distance covered by each Gender among the customers
+plt.figure(figsize=(12,5))
+sns.kdeplot(data=df,x='Miles',hue='Gender')
+plt.show()
+
+
+# •	Male customers have a consistent distance coverage than female customers
+
+# In[155]:
+
+
+# Joint Histogram with KDE plot
+sns.jointplot(x="Age", y="Fitness", data=df,height = 7,kind="kde",color="#FF6600")
+plt.show()
+
+
+# •	Majority of the customer Age group is between 20 to mid 30s who have rated atleast average
+
+# In[154]:
+
+
+# Scatterplot for customers Gender and Age who rated less than 2 in Fitness rating
+sns.jointplot(x='Age',y='Gender',data=df[df.Fitness<3])
+plt.show()
+
+
+# In[156]:
+
+
+# Scatterplot for customers Gender and Age who rated less than 3 in Fitness rating
+sns.jointplot(x='Age',y='Gender',data=df[df.Fitness<3])
+plt.show()
+
+
+# •	Above Joint plot describes the relationship between the customer age and their gender grouping.
+
+# In[158]:
+
+
+# Scatter Plot
+plt.figure(figsize=(15,10))
+sns.scatterplot(x='Miles',y='Income',data=df,hue='Fitness',style='Gender',palette='winter')
+
+
+# •	Above scattered Plot shows the overall picture over customer's income, how much they exercise (run/walk miles) given their gender and their fitness level.
+
+# In[159]:
+
+
+sns.boxplot(x='Education',y='Age',data=df)
+
+
+# •	Above box plot shows Education data against Age of the customer
+
+# In[160]:
+
+
+plt.figure(figsize=(12,5))
+sns.boxplot(x='Age',y='Product',data=df)
+plt.show()
+
+
+# •	Roughly few customers with age above 40 use product KP781
+# 
+# •	Most of the customers are comfortable with KP281 product type
+
+# In[161]:
+
+
+# Miles with each product
+plt.figure(figsize=(12,5))
+sns.boxplot(x='Miles',y='Product',data=df)
+plt.show()
+
+
+# •	Customers with product KP781, has been able to cover more miles than other two product types
+
+# In[164]:
+
+
+# Fitness of customer with each product
+plt.figure(figsize=(12,5))
+sns.boxplot(x='Fitness',y='Product',data=df)
+plt.show()
+
+
+# •	Customers with excellent shape are significantly using KP781 product type
+
+# In[167]:
+
+
+# Product used among age group seggregated by Gender
+sns.catplot(x='Age',y='Product',hue='Product',col='Gender',data=df,kind='violin')
+plt.show()
+
+
+# •	From the above catplot, male customers are equally distributed among the three product types
+# 
+# •	Female customers tend to use product KP281 and KP481 more than advanced KP781 product
+
+# In[168]:
+
+
+# Miles covered in each product by gender and their marital status
+sns.catplot(x='Gender',y='Miles',hue='Product',col='MaritalStatus',data=df,kind='bar')
+plt.show()
+
+
+# •	KP781 is more popular among the single and Partnered customers
+# 
+# •   More miles are travlled from KP781
+# 
+# •   There are more single Males buying treadmill than single Females.
+
+# ### Missing Value & Outlier Detection
+
+# In[169]:
+
+
+df.isna().sum()
+
+
+# No Null values detected in any column
+
+# In[170]:
+
+
+df.duplicated().sum()
+
+
+# No duplicates have been observed
+
+# #### Outliers
+
+# In[171]:
+
+
+# Outlier calculation for Miles using Inter Quartile Range
+q_75, q_25 = np.percentile(df['Miles'], [75 ,25])
+miles_iqr = q_75 - q_25
+print("Inter Quartile Range for Miles is", miles_iqr)
+
+
+# ### Business Insights based on Non-Graphical and Visual Analysis
+
+# In[172]:
+
+
+df.Product.value_counts(normalize=True)
+
+
+# •	Probability of buying KP281, KP481 & KP781 are 0.44, 0.33 & 0.22 respectively
+
+# In[173]:
+
+
+df.Gender.value_counts(normalize=True)
+
+
+# •	Probability of Male customer is 0.57
+# 
+# •	Probability of Female customer is 0.42
+
+# In[174]:
+
+
+df.MaritalStatus.value_counts(normalize=True)
+
+
+# •	Probability of Married/Partnered is 0.59
+# 
+# •	Probability of Single is 0.40
+
+# #### Probability for each product for the both genders
+
+# In[175]:
+
+
+def gender_Probability(gender,df):
+    print(f"Prob P(KP781) for {gender}: {round(df['KP781'][gender]/df.loc[gender].sum(),3)}")
+    print(f"Prob P(KP481) for {gender}: {round(df['KP481'][gender]/df.loc[gender].sum(),3)}")
+    print(f"Prob P(KP281) for {gender}: {round(df['KP281'][gender]/df.loc[gender].sum(),3)}")
+    
+df_temp = pd.crosstab(index=df['Gender'],columns=[df['Product']])
+print("Prob of Male: ",round(df_temp.loc['Male'].sum()/len(df),3))
+print("Prob of Female: ",round(df_temp.loc['Female'].sum()/len(df),3))
+print()
+gender_Probability('Male',df_temp)
+print()
+gender_Probability('Female',df_temp)
+
+
+# #### Probability of each product for given Marital Status
+
+# In[176]:
+
+
+def MS_Probability(ms_status,df):
+    print(f"Prob P(KP781) for {ms_status}: {round(df['KP781'][ms_status]/df.loc[ms_status].sum(),3)}")
+    print(f"Prob P(KP481) for {ms_status}: {round(df['KP481'][ms_status]/df.loc[ms_status].sum(),3)}")
+    print(f"Prob P(KP281) for {ms_status}: {round(df['KP281'][ms_status]/df.loc[ms_status].sum(),3)}")
+    
+df_temp = pd.crosstab(index=df['MaritalStatus'],columns=[df['Product']])
+print("Prob of P(Single): ",round(df_temp.loc['Single'].sum()/len(df),3))
+print("Prob of P(Married/Partnered): ",round(df_temp.loc['Partnered'].sum()/len(df),3))
+print()
+MS_Probability('Single',df_temp)
+print()
+MS_Probability('Partnered',df_temp)
+
+
+# #### Customer Age Group Analysis
+
+# In[179]:
+
+
+df_convert['age_group'] = df_convert.Age
+df_convert.head()
+
+
+# In[181]:
+
+
+# 0-21 -> Teen
+# 22-35 -> Adult
+# 36-45 -> Middle Age
+# 46-60 -> Elder Age
+df_convert.age_group = pd.cut(df.age_group,bins=[0,21,35,45,60],labels=['Teen','Adult','Middle Aged','Elder'])
+
+
+# In[182]:
+
+
+df_convert.head()
+
+
+# In[183]:
+
+
+df_convert.age_group.value_counts()
+
+
+# In[185]:
+
+
+df_convert.loc[df_convert.Product=='KP281']["age_group"].value_counts()
+
+
+# In[187]:
+
+
+df_convert.loc[df_convert.Product=='KP481']["age_group"].value_counts()
+
+
+# In[188]:
+
+
+df_convert.loc[df_convert.Product=='KP781']["age_group"].value_counts()
+
+
+# In[189]:
+
+
+pd.crosstab(index=df_convert.Product,columns=df_convert.age_group,margins=True)
+
+
+# In[190]:
+
+
+# Conditional and Marginal Probabilities with product type and age group
+np.round(pd.crosstab(index=df_convert.Product,columns=df_convert.age_group,normalize=True,margins=True)*100,2)
+
+
+# In[192]:
+
+
+pd.crosstab(columns=df_convert["Fitness_Category"],index=df_convert["Product"])
+
+
+# In[193]:
+
+
+round(pd.crosstab(index=df_convert["Product"],columns=df_convert["Fitness_Category"],normalize="columns")*100,2)
+
+
+# In[194]:
+
+
+pd.crosstab(index=[df_convert.Product,df_convert.Fitness_Category],columns=df_convert.Gender)
+
+
+# In[196]:
+
+
+round(pd.crosstab(index=[df_convert.Product,df_convert.Fitness_Category],columns=df_convert.Gender,normalize=True)*100,2)
+
+
+# In[198]:
+
+
+round(pd.crosstab(index=[df_convert.Product,df_convert.MaritalStatus],columns=df_convert.Gender,normalize=True),2)
+
+
+# ### Conditional and Marginal Probabilities
+
+# #### Two-Way Contingency Table
+
+# #### Marginal Probabilities
+
+# In[199]:
+
+
+sns.countplot(x = "Product", data= df, hue = "Gender")
+plt.xlabel("Products")
+plt.title("Count of Male and Female uses Particular Products")
+plt.show()
+
+
+# In[202]:
+
+
+pd.crosstab([df.Product],df.Gender,margins=True)
+
+
+# In[203]:
+
+
+np.round(((pd.crosstab(df.Product,df.Gender,margins=True))/180)*100,2)
+
+
+# Marginal Probability
+# 
+#     •	Probability of Male Customer Purchasing any product is : 57.77 %
+# 
+#     •	Probability of Female Customer Purchasing any product is : 42.22 %
+# 
+# Marginal Probability of any customer buying
+# 
+#     •	product KP281 is : 44.44 % (cheapest / entry level product)
+# 
+#     •	product KP481 is : 33.33 % (intermediate user level product)
+# 
+#     •	product KP781 is : 22.22 % (Advanced product with ease of use that help in covering longer distance)
+
+# #### Conditional Probabilities
+
+# In[204]:
+
+
+np.round((pd.crosstab([df.Product],df.Gender,margins=True,normalize="columns"))*100,2)
+
+
+# #### Probability of Selling Product
+
+# KP281 | Female = 52 %
+# 
+# KP481 | Female = 38 %
+# 
+# KP781 | Female = 10 %
+# 
+# KP281 | male = 38 %
+# 
+# KP481 | male = 30 %
+# 
+# KP781 | male = 32 %
+# 
+# Probability of Female customer buying KP281(52.63%) is more than male(38.46%).
+# 
+# KP281 is more recommended for female customers.
+# 
+# Probability of Male customer buying Product KP781(31.73%) is way more than female(9.21%).
+# 
+# Probability of Female customer buying Product KP481(38.15%) is significantly higher than male (29.80%. )
+# 
+# KP481 product is specifically recommended for Female customers who are intermediate user.
+
+# ### Objective: Customer Profiling for Each Product
+
+# Customer profiling based on the 3 product categories provided
+
+# #### KP281
+
+# •	Easily affordable entry level product, which is also the maximum selling product.
+# 
+# •	KP281 is the most popular product among the entry level customers.
+# 
+# •	This product is easily afforded by both Male and Female customers.
+# 
+# •	Average distance covered in this model is around 70 to 90 miles.
+# 
+# •	Product is used 3 to 4 times a week.
+# 
+# •	Most of the customer who have purchased the product have rated Average shape as the fitness rating.
+# 
+# •	Younger to Elder beginner level customers prefer this product.
+# 
+# •	Single female & Partnered male customers bought this product more than single male customers.
+# 
+# •	Income range between 39K to 53K have preferred this product.
+
+# #### KP481
+
+# •	This is an Intermediate level Product.
+# 
+# •	KP481 is the second most popular product among the customers.
+# 
+# •	Fitness Level of this product users varies from Bad to Average Shape depending on their usage.
+# 
+# •	Customers Prefer this product mostly to cover more miles than fitness.
+# 
+# •	Average distance covered in this product is from 70 to 130 miles per week.
+# 
+# •	More Female customers prefer this product than males.
+# 
+# •	Probability of Female customer buying KP481 is significantly higher than male.
+# 
+# •	KP481 product is specifically recommended for Female customers who are intermediate user.
+# 
+# •	Three different age groups prefer this product - Teen, Adult and middle aged.
+# 
+# •	Average Income of the customer who buys KP481 is 49K.
+# 
+# •	Average Usage of this product is 3 days per week.
+# 
+# •	More Partnered customers prefer this product.
+# 
+# •	There are slightly more male buyers of the KP481.
+# 
+# •	The distance travelled on the KP481 treadmill is roughly between 75 - 100 Miles. It is also the 2nd most distance travelled model.
+# 
+# •	The buyers of KP481 in Single & Partnered, Male & Female are same.
+# 
+# •	The age range of KP481 treadmill customers is roughly between 24-34 years.
+
+# #### KP781
+
+# •	Due to the High Price & being the advanced type, customer prefers less of this product.
+# 
+# •	Customers use this product mainly to cover more distance.
+# 
+# •	Customers who use this product have rated excelled shape as fitness rating.
+# 
+# •	Customer walk/run average 120 to 200 or more miles per week on his product.
+# 
+# •	Customers use 4 to 5 times a week at least.
+# 
+# •	Female Customers who are running average 180 miles (extensive exercise) , are using product KP781, which is higher than Male average using same product.
+# 
+# •	Probability of Male customer buying Product KP781(31.73%) is way more than female(9.21%).
+# 
+# •	Probability of a single person buying KP781 is higher than Married customers. So , KP781 is also recommended for people who are single and exercises more.
+# 
+# •	Middle aged to higher age customers tend to use this model to cover more distance.
+# 
+# •	Average Income of KP781 buyers are over 75K per annum
+# 
+# •	Partnered Female bought KP781 treadmill compared to Partnered Male.
+# 
+# •	Customers who have more experience with previous aerofit products tend to buy this product
+# 
+# •	This product is preferred by the customer where the correlation between Education and Income is High.
+
+# ### Recommendation
+
+# •	Female who prefer exercising equipments are very low here. Hence, we should run a marketing campaign on to encourage women to exercise more
+# 
+# •	KP281 & KP481 treadmills are preferred by the customers whose annual income lies in the range of 39K - 53K Dollars. These models should promoted as budget treadmills.
+# 
+# •	As KP781 provides more features and functionalities, the treadmill should be marketed for professionals and athletes.
+# 
+# •	KP781 product should be promotted using influencers and other international atheletes.
+# 
+# •	Research required for expanding market beyond 50 years of age considering health pros and cons.
+# 
+# •	Provide customer support and recommend users to upgrade from lower versions to next level versions after consistent usages.
+# 
+# •	KP781 can be recommended for Female customers who exercises extensively along with easy usage guidance since this type is advanced.
+# 
+# •	Target the Age group above 40 years to recommend Product KP781.
+
+# ### Thank you!!!
+
